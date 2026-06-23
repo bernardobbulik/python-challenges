@@ -12,46 +12,54 @@ janela.grid_columnconfigure(0, weight=1)
 janela.grid_columnconfigure(1, weight=1)
 
 # =============== Funcionamento ==============
+def geraClassificacao(aproveitamento: int):
+    if(aproveitamento >= 70):
+        classificacao = "EXCELENTE"
+        cor = "green"
+    elif(aproveitamento >= 50 and aproveitamento < 70):
+        classificacao = "BOM"
+        cor = "orange"
+    elif(aproveitamento >= 30 and aproveitamento < 50):
+        classificacao = "REGULAR"
+        cor = "yellow"
+    else:
+        classificacao = "RUIM"
+        cor = "red"
+    return {
+        "classificacao": classificacao,
+        "cor" : cor
+    }
+
+def calculaAproveitamento(vitorias: int, empates: int, derrotas: int):
+    totalPontos = (vitorias * 3) + (empates * 1)
+    maximoPontos = (vitorias + empates + derrotas) * 3
+    
+    return {
+        "total": totalPontos,
+        "aproveitamento": (totalPontos / maximoPontos) * 100
+    } 
+    
+
 def verificaDesempenho():
     # Entrada e Processamento
     try:
         vitorias = int(entrada_vitorias.get())
         empates = int(entrada_empates.get())
         derrotas = int(entrada_derrotas.get())
+        
+        if(vitorias < 0 or empates < 0 or derrotas < 0):
+            messagebox.showerror(title="Erro", message="Insira valores POSITIVOS!")
+            limpaTela()
+            return
     except ValueError:
         messagebox.showerror(title="Erro", message="Insira somente VALORES VÁLIDOS!")
         limpaTela()
         return
     
-    if(vitorias < 0 or empates < 0 or derrotas < 0):
-        messagebox.showerror(title="Erro", message="Insira valores POSITIVOS!")
-        limpaTela()
-        return
-    
-    try:
-        classificacao = ""
-        cor = ""
-        totalPontos = (vitorias * 3) + (empates * 1)
-        maximoPontos = (vitorias + empates + derrotas) * 3
-        aproveitamento = (totalPontos / maximoPontos) * 100
-        
-        if(aproveitamento >= 70):
-            classificacao = "EXCELENTE"
-            cor = "green"
-        elif(aproveitamento >= 50 and aproveitamento < 70):
-            classificacao = "BOM"
-            cor = "orange"
-        elif(aproveitamento >= 30 and aproveitamento < 50):
-            classificacao = "REGULAR"
-            cor = "yellow"
-        else:
-            classificacao = "RUIM"
-            cor = "red"
-    except ArithmeticError:
-        messagebox.showerror(title="Erro",message="Houve um erro ao calcular o desempenho.")
-        limpaTela()
-        return
-    
+    aproveitamento = calculaAproveitamento(vitorias, empates, derrotas)["aproveitamento"]
+    totalPontos = calculaAproveitamento(vitorias, empates, derrotas)["total"]
+    classificacao= geraClassificacao(aproveitamento)["classificacao"]
+    cor = geraClassificacao(aproveitamento)["cor"]
     
     # Saída
     label_aproveitamento.config(text=f"Aproveitamento: {aproveitamento:.2f}%")
